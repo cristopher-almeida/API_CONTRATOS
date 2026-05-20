@@ -17,7 +17,7 @@ namespace ApiContratos.models
         public DateOnly DataInicio { get;set;} // Data de início do contrato.
         public DateOnly Validade { get;set;} //Data de vencimento do contrato.
 
-        // Esta propriedade calcula quantos dias faltam para o contrato vencer.
+        // Calcula quantos dias faltam para o contrato vencer.
         public int Diasparavencer { get 
             {// Pega a data de hoje do computador. // DateOnly.FromDateTime remove a parte da hora. 
                 DateOnly hoje = DateOnly.FromDateTime(DateTime.Today);
@@ -28,7 +28,7 @@ namespace ApiContratos.models
         public StatusContrato Status{ get
         {
             DateOnly hoje = DateOnly.FromDateTime(DateTime.Today);
-              // Calcula quantos dias faltam para o contrato vencer.
+              
             int diasRestantes = Validade.DayNumber - hoje.DayNumber;
 
             if (diasRestantes < 0)

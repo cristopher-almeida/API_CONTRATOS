@@ -1,3 +1,4 @@
+using ApiContratos.Repositorio;
 using ApiContratos.models;
 
 namespace ApiContratos.Routes;
@@ -6,23 +7,27 @@ public static class ROTA_PUT
 {
     public static void MapPutRoutes(this WebApplication app)
     {
-        List<Contrato> contratos = new List<Contrato>();
 
-        app.MapPut("/api/referencias/{id}", (int id, Contrato atualizada) =>
+        app.MapPut("/api/contratos/{id:int}", (int id, Contrato atualizado) =>
         {
-            var refItem = contratos.FirstOrDefault(r => r.Id == id);
-            if (refItem is null)
-                return Results.NotFound("Referência não encontrada.");
+            var contrato = ContratoRepositorio.contratos
+                .FirstOrDefault(c => c.Id == id);
 
-            refItem.Empresa = atualizada.Empresa;
-            refItem.Id = atualizada.Id;
-            refItem.Nome = atualizada.Nome;
-            refItem.Valor = atualizada.Valor;
-            refItem.Responsavel = atualizada.Responsavel;
-            refItem.DataInicio = atualizada.DataInicio;
-            refItem.Validade = atualizada.Validade;
+            if (contrato == null)
+            {
+                return Results.NotFound("Contrato não encontrado.");
+            }
+            else
+            {
+                contrato.Empresa = atualizado.Empresa;
+                contrato.Nome = atualizado.Nome;
+                contrato.Valor = atualizado.Valor;
+                contrato.Responsavel = atualizado.Responsavel;
+                contrato.DataInicio = atualizado.DataInicio;
+                contrato.Validade = atualizado.Validade;
 
-            return Results.Ok(refItem);
+            return Results.Ok(contrato);
+            }
         });
     }
 }

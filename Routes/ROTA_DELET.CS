@@ -1,4 +1,4 @@
-using ApiContratos.models;
+using ApiContratos.Repositorio;
 
 namespace ApiContratos.Routes;
 
@@ -6,15 +6,19 @@ public static class ROTA_DELETE
 {
     public static void MapDeleteRoutes(this WebApplication app)
     {
-        List<Contrato> contratos = new List<Contrato>();
 
-        app.MapDelete("/api/contratos/{id}", (int id) =>
+        app.MapDelete("/api/contratos/{id:int}", (int id) =>
         {
-            var refItem = contratos.FirstOrDefault(r => r.Id == id);
-            if (refItem is null)
-                return Results.NotFound("Referência não encontrada.");
+            var contrato = ContratoRepositorio.contratos
+                .FirstOrDefault(c => c.Id == id);
 
-            contratos.Remove(refItem);
+            if (contrato is null)
+            {
+                return Results.NotFound("Contrato não encontrado.");
+            }
+
+            ContratoRepositorio.contratos.Remove(contrato);
+
             return Results.NoContent();
         });
     }
