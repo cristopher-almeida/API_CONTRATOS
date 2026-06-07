@@ -25,6 +25,11 @@ public static class ROTA_GET
             var contratosInativos = ContratoRepositorio.contratos.Where(c => c.Status == StatusContrato.Vencido).ToList();
             return Results.Ok(contratosInativos);
         });
+        app.MapGet("/api/contratos/pertodevencer", () =>
+        {
+            var contratosInativos = ContratoRepositorio.contratos.Where(c => c.Status == StatusContrato.PertoDeVencer).ToList();
+            return Results.Ok(contratosInativos);
+        });
 
         app.MapGet("/api/contratos/{id:int}", (int id) =>
         {
@@ -39,5 +44,45 @@ public static class ROTA_GET
                 return Results.NotFound("Contrato não encontrado.");
             }
         });
+        app.MapGet("/api/contratos/entradas", () =>
+{
+    var entradas = ContratoRepositorio.contratos
+        .Where(c => c.TipoFinanceiro == TipoFinanceiro.Entrada)
+        .ToList();
+
+    return Results.Ok(entradas);
+});
+
+app.MapGet("/api/contratos/saidas", () =>
+{
+    var saidas = ContratoRepositorio.contratos
+        .Where(c => c.TipoFinanceiro == TipoFinanceiro.Saida)
+        .ToList();
+
+    return Results.Ok(saidas);
+});
+
+app.MapGet("/api/contratos/resumo_finaceiro", () =>
+{
+    decimal totalEntradas = ContratoRepositorio.contratos
+        .Where(c => c.TipoFinanceiro == TipoFinanceiro.Entrada)
+        .Sum(c => c.Valor);
+
+    decimal totalSaidas = ContratoRepositorio.contratos
+        .Where(c => c.TipoFinanceiro == TipoFinanceiro.Saida)
+        .Sum(c => c.Valor);
+
+    decimal saldo = totalEntradas - totalSaidas;
+
+    var resumo = new
+    {
+        TotalEntradas = totalEntradas,
+        TotalSaidas = totalSaidas,
+        Saldo = saldo
+    };
+
+    return Results.Ok(resumo);
+});
+
     }
 }

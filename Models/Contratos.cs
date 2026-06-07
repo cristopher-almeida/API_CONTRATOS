@@ -6,6 +6,12 @@ namespace ApiContratos.models
         PertoDeVencer,
         Vencido
     }
+    // O enum define o tipo do contrato.
+    public enum TipoFinanceiro
+{
+    Entrada,
+    Saida
+}
 // Esta classe define quais informações um contrato terá na API.
     public class Contrato
     {
@@ -16,6 +22,7 @@ namespace ApiContratos.models
         public string Responsavel { get;set;} // Pessoa responsável pelo contrato.
         public DateOnly DataInicio { get;set;} // Data de início do contrato.
         public DateOnly Validade { get;set;} //Data de vencimento do contrato.
+        public TipoFinanceiro TipoFinanceiro { get; set; }//define se o contrato e de entrada ou saida de dinheiro
 
         // Calcula quantos dias faltam para o contrato vencer.
         public int Diasparavencer { get 
