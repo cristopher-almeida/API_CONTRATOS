@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("API_CONTRATOS")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4045cfb222e18f92dc5c280ab39d116f6fe92a31")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5a1b58fd261f8771aaead464e2b928dccc0c7f70")]
 [assembly: System.Reflection.AssemblyProductAttribute("API_CONTRATOS")]
 [assembly: System.Reflection.AssemblyTitleAttribute("API_CONTRATOS")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
