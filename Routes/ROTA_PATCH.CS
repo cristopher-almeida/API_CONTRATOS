@@ -24,6 +24,10 @@ public static class ROTA_PATCH
             if (parcial.Valor > 0)                         contrato.Valor      = parcial.Valor;
             if (parcial.DataInicio != default)             contrato.DataInicio = parcial.DataInicio;
             if (parcial.Validade   != default)             contrato.Validade   = parcial.Validade;
+            if (Enum.IsDefined(typeof(TipoFinanceiro), parcial.TipoFinanceiro))
+            {
+                contrato.TipoFinanceiro = parcial.TipoFinanceiro;
+            }
 
             return Results.Ok(contrato);
         });

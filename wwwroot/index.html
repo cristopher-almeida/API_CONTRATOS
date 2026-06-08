@@ -182,6 +182,7 @@
             <th>Contrato</th>
             <th>Responsável</th>
             <th>Valor</th>
+            <th>Tipo</th>
             <th>Início</th>
             <th>Validade</th>
             <th>Dias p/ vencer</th>
@@ -191,9 +192,9 @@
         </thead>
         <tbody id="corpoTabela">
           <!-- Linhas de carregamento (aparecem enquanto busca os dados) -->
-          <tr class="linha-carregando"><td colspan="9"><div class="animacao-carregamento"></div></td></tr>
-          <tr class="linha-carregando"><td colspan="9"><div class="animacao-carregamento"></div></td></tr>
-          <tr class="linha-carregando"><td colspan="9"><div class="animacao-carregamento"></div></td></tr>
+          <tr class="linha-carregando"><td colspan="10"><div class="animacao-carregamento"></div></td></tr>
+          <tr class="linha-carregando"><td colspan="10"><div class="animacao-carregamento"></div></td></tr>
+          <tr class="linha-carregando"><td colspan="10"><div class="animacao-carregamento"></div></td></tr>
         </tbody>
       </table>
     </div>
@@ -275,6 +276,15 @@
         <div class="grupo-campo">
           <label class="rotulo-campo">Responsável <span class="obrigatorio">*</span></label>
           <input type="text" id="campoResponsavel" class="campo-input" placeholder="Nome do responsável" required />
+        </div>
+
+      <div class="linha-formulario">
+         <div class="grupo-campo">
+          <label class="rotulo-campo">Tipo financeiro <span class="obrigatorio">*</span></label>
+          <select id="campoTipoFinanceiro" class="campo-input" required>
+            <option value="Entrada">Entrada</option>
+            <option value="Saida">Saída</option>
+          </select>
         </div>
       </div>
 

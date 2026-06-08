@@ -25,7 +25,7 @@ public static class ROTA_PUT
                 contrato.Responsavel = atualizado.Responsavel;
                 contrato.DataInicio = atualizado.DataInicio;
                 contrato.Validade = atualizado.Validade;
-
+                contrato.TipoFinanceiro = atualizado.TipoFinanceiro;
             return Results.Ok(contrato);
             }
         });
