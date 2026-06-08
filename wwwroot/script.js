@@ -139,8 +139,10 @@ function aplicarFiltros() {
     // Verifica se a validade está dentro do período escolhido
     let passouPeriodo = true;
     if (periodoEscolhido) {
-      const dias = parseInt(periodoEscolhido);
-      passouPeriodo = contrato.diasparavencer >= 0 && contrato.diasParaVencer <= dias;
+  const limiteDias = parseInt(periodoEscolhido);
+
+  const diasParaVencer = contrato.diasParaVencer;
+   passouPeriodo = diasParaVencer >= 0 && diasParaVencer <= limiteDias;
     }
 
     return passouBusca && passouStatus && passouPeriodo;
