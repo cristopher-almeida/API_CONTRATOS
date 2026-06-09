@@ -1,16 +1,16 @@
-/*
-   CONTRACT FLOW — Comportamental 
+/* CONTRACT FLOW — Arquivo de Comportamento
+   
    Este arquivo é responsável por:
    1. Buscar os contratos da API C#
    2. Exibir os dados na tabela
    3. Filtrar e buscar contratos
    4. Abrir/fechar as janelas flutuantes
    5. Criar, editar e excluir contratos
-   6. Exportar relatórios
- */
+   6. Exportar relatórios */
 
 
 /* CONFIGURAÇÕES INICIAIS */
+
 // Endereço da API C# (onde os dados estão)
 const ENDERECO_API = 'http://localhost:5043/api/contratos';
 
@@ -20,9 +20,9 @@ const CONTRATOS_POR_PAGINA = 10;
 
 /* VARIÁVEIS DE ESTADO
    (guardam informações enquanto a página está aberta) */
-let todosOsContratos  = [];  // lista vinda da API
+let todosOsContratos  = [];  // lista completa vinda da API
 let contratosFiltrados = [];  // lista após aplicar filtros
-let paginaAtual       = 1;   // página que está sendo exibida
+let paginaAtual       = 1;   // qual página está sendo exibida
 let idEditando        = null; // id do contrato sendo editado (null = novo)
 let contratoVisualizando = null; // contrato aberto na janela de detalhes
 
@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* COMUNICAÇÃO COM A API C#
    (as funções abaixo fazem requisições HTTP) */
+
 // Busca todos os contratos da API (método GET)
 async function carregarContratos() {
   try {
@@ -93,7 +94,7 @@ async function excluirContrato(id) {
 }
 
 
-/*INDICADORES (os 4 cartões do topo) */
+/*  INDICADORES (os 4 cartões do topo) */
 function atualizarIndicadores() {
   const total    = todosOsContratos.length;
   const ativos   = todosOsContratos.filter(c => c.status === 'Ativo').length;
@@ -139,10 +140,8 @@ function aplicarFiltros() {
     // Verifica se a validade está dentro do período escolhido
     let passouPeriodo = true;
     if (periodoEscolhido) {
-  const limiteDias = parseInt(periodoEscolhido);
-
-  const diasParaVencer = contrato.diasParaVencer;
-   passouPeriodo = diasParaVencer >= 0 && diasParaVencer <= limiteDias;
+      const dias = parseInt(periodoEscolhido);
+      passouPeriodo = contrato.diasparavencer >= 0 && contrato.diasparavencer <= dias;
     }
 
     return passouBusca && passouStatus && passouPeriodo;
@@ -173,7 +172,7 @@ function montarTabela() {
   // Nenhum resultado encontrado
   if (contratosDaPagina.length === 0) {
     corpoTabela.innerHTML = `
-      <tr><td colspan="10">
+      <tr><td colspan="9">
         <div class="estado-vazio">
           <i class="fa-solid fa-file-circle-exclamation"></i>
           <h3>Nenhum contrato encontrado</h3>
@@ -191,27 +190,18 @@ function montarTabela() {
 
 // Monta o HTML de uma linha da tabela
 function montarLinha(contrato) {
-
-  const dias = contrato.diasParaVencer
   // Define a cor dos dias para vencer
-  const classeDias = dias < 0 ? 'dias-vencido' :
-                     dias <= 3 ? 'dias-critico' :
-                     dias <= 7 ? 'dias-atencao' : 'dias-normal';
+  const classeDias = contrato.diasparavencer < 0 ? 'dias-vencido' :
+                     contrato.diasparavencer <= 3 ? 'dias-critico' :
+                     contrato.diasparavencer <= 7 ? 'dias-atencao' : 'dias-normal';
 
-  const textoDias = dias < 0 ? `${Math.abs(dias)} dias vencido` :
-                    dias === 0 ? 'Vence hoje' :
-                    `${dias} dias`;                  
-  
-
-  const classeTipoFinanceiro = contrato.tipoFinanceiro === 'Saida' ? 'tipo-saida' : 'tipo-entrada';
-  const textoTipoFinanceiro = contrato.tipoFinanceiro === 'Saida' ? 'Saída' : 'Entrada';
+  const textoDias = contrato.diasparavencer <= 0 ? '0 dias' : `${contrato.diasparavencer} dias`;
 
   // Define a etiqueta de status
   const classeStatus = contrato.status === 'Ativo' ? 'status-ativo' :
                        contrato.status === 'PertoDeVencer' ? 'status-perto' : 'status-vencido';
   const textoStatus  = contrato.status === 'Ativo' ? 'Ativo' :
                        contrato.status === 'PertoDeVencer' ? 'Perto de vencer' : 'Vencido';
-  
 
   return `
     <tr>
@@ -219,7 +209,6 @@ function montarLinha(contrato) {
       <td class="coluna-contrato">${escapar(contrato.nome)}</td>
       <td>${escapar(contrato.responsavel)}</td>
       <td class="coluna-valor">${formatarDinheiro(contrato.valor)}</td>
-      <td><span class="badge-tipo-financeiro ${classeTipoFinanceiro}">${textoTipoFinanceiro}</span></td>
       <td>${formatarData(contrato.dataInicio)}</td>
       <td>${formatarData(contrato.validade)}</td>
       <td class="coluna-dias ${classeDias}">${textoDias}</td>
@@ -277,6 +266,7 @@ window.irParaPagina = numeroPagina => {
 
 
 /* JANELAS FLUTUANTES */
+
 // Abre a janela de novo contrato
 function abrirJanelaNovoContrato() {
   idEditando = null;
@@ -301,10 +291,8 @@ function abrirEdicao(id) {
   pegar('campoNome').value        = contrato.nome?.trim() || '';
   pegar('campoValor').value       = contrato.valor;
   pegar('campoResponsavel').value = contrato.responsavel?.trim() || '';
-  pegar('campoTipoFinanceiro').value = contrato.tipoFinanceiro || 'Entrada';
   pegar('campoInicio').value      = paraFormatoData(contrato.dataInicio);
   pegar('campoValidade').value    = paraFormatoData(contrato.validade);
-  
 
   pegar('fundoJanela').classList.add('aberto');
 }
@@ -347,10 +335,6 @@ function abrirVisualizacao(id) {
       <span class="valor-detalhe">${formatarDinheiro(contrato.valor)}</span>
     </div>
     <div class="campo-detalhe">
-      <span class="rotulo-detalhe">Tipo financeiro</span>
-      <span class="valor-detalhe">${contrato.tipoFinanceiro === 'Saida' ? 'Saída' : 'Entrada'}</span>
-    </div>
-    <div class="campo-detalhe">
       <span class="rotulo-detalhe">Data de início</span>
       <span class="valor-detalhe">${formatarData(contrato.dataInicio)}</span>
     </div>
@@ -378,6 +362,7 @@ function fecharVisualizacao() {
 
 
 /* FORMULÁRIO */
+
 // Executado quando o formulário é enviado
 async function enviarFormulario(evento) {
   evento.preventDefault(); // evita que a página recarregue
@@ -389,7 +374,6 @@ async function enviarFormulario(evento) {
     nome:       pegar('campoNome').value.trim(),
     valor:      parseFloat(pegar('campoValor').value),
     responsavel: pegar('campoResponsavel').value.trim(),
-    tipoFinanceiro: pegar('campoTipoFinanceiro').value,
     dataInicio: pegar('campoInicio').value,
     validade:   pegar('campoValidade').value
   };
@@ -427,7 +411,7 @@ async function enviarFormulario(evento) {
 // Verifica se todos os campos obrigatórios foram preenchidos
 function validarFormulario() {
   let valido = true;
-  const campos = ['campoEmpresa','campoNome','campoValor','campoResponsavel','campoTipoFinanceiro','campoInicio','campoValidade'];
+  const campos = ['campoEmpresa','campoNome','campoValor','campoResponsavel','campoInicio','campoValidade'];
 
   campos.forEach(id => {
     const campo = pegar(id);
@@ -450,7 +434,7 @@ function limparFormulario() {
 }
 
 
-/*EXCLUSÃO */
+/* EXCLUSÃO */
 async function confirmarExclusao(id) {
   const contrato = todosOsContratos.find(c => c.id === id);
 
@@ -471,19 +455,19 @@ async function confirmarExclusao(id) {
 
 
 /* EXPORTAÇÃO DE RELATÓRIOS */
+
 // Exporta os dados em formato CSV (abre no Excel)
 function exportarCSV() {
   const dados = contratosFiltrados.length ? contratosFiltrados : todosOsContratos;
   if (!dados.length) { mostrarMensagem('Sem dados para exportar.', 'aviso'); return; }
 
-  const cabecalho = ['ID','Empresa','Contrato','Responsável','Valor (R$)','Tipo Financeiro','Data Início','Validade','Dias p/ Vencer','Status'];
+  const cabecalho = ['ID','Empresa','Contrato','Responsável','Valor (R$)','Data Início','Validade','Dias p/ Vencer','Status'];
   const linhas = dados.map(c => [
     c.id,
     `"${(c.empresa||'').trim()}"`,
     `"${(c.nome||'').trim()}"`,
     `"${(c.responsavel||'').trim()}"`,
     c.valor,
-    c.tipoFinanceiro === 'Saida' ? 'Saída' : 'Entrada',
     formatarData(c.dataInicio),
     formatarData(c.validade),
     c.diasparavencer,
@@ -537,6 +521,7 @@ function dataHoje() {
 
 
 /* FUNÇÕES AUXILIARES */
+
 // Formata um número para moeda brasileira (R$ 2.500,00)
 function formatarDinheiro(valor) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor ?? 0);
@@ -587,7 +572,8 @@ function mostrarErroNaTabela(texto) {
 }
 
 
-/* MENSAGENS DE CONFIRMAÇÃO
+/*
+    MENSAGENS DE CONFIRMAÇÃO
    (aparecem no canto inferior direito) */
 function mostrarMensagem(texto, tipo = 'info') {
   const icones = {
@@ -679,10 +665,146 @@ function comAtraso(funcao, tempo) {
   };
 }
 
-// Links da barra lateral (em desenvolvimento)
-document.querySelectorAll('.item-menu:not(.ativo)').forEach(link => {
+
+/* PAINEL INFORMATIVO — FUNCIONALIDADES FUTURAS
+   Aparece quando o usuário clica nos itens do
+   menu lateral e no sino de notificações */
+
+// Dados de cada funcionalidade futura
+const informacoesFuncionalidades = {
+  contratos: {
+    icone: 'fa-solid fa-file-contract',
+    cor: '#1a56db',
+    corFundo: '#ebf1ff',
+    titulo: 'Módulo de Contratos',
+    descricao: 'Página dedicada para visualizar e gerenciar todos os contratos com filtros avançados e visualizações detalhadas.',
+    itens: [
+      'Visualização em lista e em cards',
+      'Filtros avançados por empresa, valor e período',
+      'Histórico de alterações de cada contrato',
+      'Anexo de documentos em PDF'
+    ]
+  },
+  vencimentos: {
+    icone: 'fa-solid fa-clock',
+    cor: '#c27803',
+    corFundo: '#fdf3c0',
+    titulo: 'Módulo de Vencimentos',
+    descricao: 'Calendário e linha do tempo com todos os contratos ordenados por data de vencimento.',
+    itens: [
+      'Calendário visual de vencimentos',
+      'Alertas automáticos por e-mail',
+      'Linha do tempo interativa',
+      'Renovação de contratos com um clique'
+    ]
+  },
+  empresas: {
+    icone: 'fa-solid fa-building',
+    cor: '#057a55',
+    corFundo: '#def7ec',
+    titulo: 'Módulo de Empresas',
+    descricao: 'Cadastro completo das empresas parceiras com todos os contratos vinculados a cada uma.',
+    itens: [
+      'Cadastro de empresas com CNPJ',
+      'Histórico de contratos por empresa',
+      'Contatos e responsáveis cadastrados',
+      'Relatório de faturamento por empresa'
+    ]
+  },
+  relatorios: {
+    icone: 'fa-solid fa-chart-bar',
+    cor: '#6b21a8',
+    corFundo: '#f3e8ff',
+    titulo: 'Módulo de Relatórios',
+    descricao: 'Painel analítico com gráficos e métricas detalhadas sobre todos os contratos da empresa.',
+    itens: [
+      'Gráficos de contratos por status',
+      'Evolução de faturamento mensal',
+      'Exportação em PDF com gráficos',
+      'Comparativo entre períodos'
+    ]
+  },
+  notificacoes: {
+    icone: 'fa-solid fa-bell',
+    cor: '#c81e1e',
+    corFundo: '#fde8e8',
+    titulo: 'Central de Notificações',
+    descricao: 'Sistema de alertas automáticos para manter a equipe informada sobre eventos importantes.',
+    itens: [
+      'Alertas de contratos próximos ao vencimento',
+      'Notificações de novos cadastros',
+      'Histórico de todas as notificações',
+      'Configuração de preferências de alerta'
+    ]
+  }
+};
+
+// Abre o painel com as informações da funcionalidade clicada
+function abrirPainelInfo(chave) {
+  const info = informacoesFuncionalidades[chave];
+  if (!info) return;
+
+  // Atualiza o ícone e sua cor
+  const iconeEl = pegar('painelInfoIcone');
+  iconeEl.innerHTML = `<i class="${info.icone}"></i>`;
+  iconeEl.style.background = info.corFundo;
+  iconeEl.style.color = info.cor;
+
+  // Atualiza o título e descrição
+  pegar('painelInfoTitulo').textContent = info.titulo;
+  pegar('painelInfoDescricao').textContent = info.descricao;
+
+  // Monta a lista de funcionalidades
+  const lista = pegar('painelInfoLista');
+  lista.innerHTML = info.itens.map(item => `
+    <li>
+      <i class="fa-solid fa-check"></i>
+      ${item}
+    </li>
+  `).join('');
+
+  // Abre o painel
+  pegar('fundoPainelInfo').classList.add('aberto');
+}
+
+// Fecha o painel
+function fecharPainelInfo() {
+  pegar('fundoPainelInfo').classList.remove('aberto');
+}
+
+// Vincula os eventos do painel informativo
+function vincularEventosPainelInfo() {
+
+  // Itens do menu lateral (exceto o Dashboard que já está ativo)
+  const mapaMenus = {
+    'Contratos':   'contratos',
+    'Vencimentos': 'vencimentos',
+    'Empresas':    'empresas',
+    'Relatórios':  'relatorios'
+  };
+
+  document.querySelectorAll('.item-menu:not(.ativo)').forEach(link => {
     link.addEventListener('click', e => {
-        e.preventDefault(); // evita navegar
-        mostrarMensagem('Módulo em desenvolvimento.', 'info');
+      e.preventDefault();
+      // Descobre qual menu foi clicado pelo texto
+      const texto = link.textContent.trim();
+      const chave = mapaMenus[texto];
+      if (chave) abrirPainelInfo(chave);
     });
-});
+  });
+
+  // Sino de notificações
+  pegar('btnNotificacoes').addEventListener('click', () => {
+    abrirPainelInfo('notificacoes');
+  });
+
+  // Botões de fechar o painel
+  pegar('btnFecharPainelInfo').addEventListener('click', fecharPainelInfo);
+  pegar('btnFecharPainelInfoOk').addEventListener('click', fecharPainelInfo);
+  pegar('fundoPainelInfo').addEventListener('click', e => {
+    if (e.target === pegar('fundoPainelInfo')) fecharPainelInfo();
+  });
+}
+
+// Chama a função de vincular ao carregar a página
+document.addEventListener('DOMContentLoaded', vincularEventosPainelInfo);

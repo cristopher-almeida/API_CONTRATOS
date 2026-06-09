@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contract Flow | Dashboard</title>
+  <title>Contract Flow – Dashboard</title>
 
   <!-- Biblioteca de ícones Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -17,10 +17,10 @@
 </head>
 <body>
 
-<!--  BARRA LATERAL (menu de navegação) -->
+<!-- BARRA LATERAL (menu de navegação) -->
 <aside class="barra-lateral">
 
-<!-- "Logo" da empresa -->
+  <!-- Logo da empresa -->
   <div class="logo-area">
     <span class="logo-sigla">CF</span>
     <span class="logo-nome">Contract<strong>Flow</strong></span>
@@ -50,12 +50,19 @@
     </a>
   </nav>
 
-  
+  <!-- Informações do usuário logado -->
+  <div class="area-usuario">
+    <div class="avatar-usuario">TS</div>
+    <div class="info-usuario">
+      <span class="nome-usuario">Talita Souza</span>
+      <span class="cargo-usuario">Administradora</span>
+    </div>
+  </div>
 
 </aside>
 
 
-<!-- CONTEÚDO PRINCIPAL DA PÁGINA-->
+<!-- CONTEÚDO PRINCIPAL DA PÁGINA -->
 <main class="conteudo-principal">
 
   <!-- Barra do topo com título e botão -->
@@ -182,7 +189,6 @@
             <th>Contrato</th>
             <th>Responsável</th>
             <th>Valor</th>
-            <th>Tipo</th>
             <th>Início</th>
             <th>Validade</th>
             <th>Dias p/ vencer</th>
@@ -192,9 +198,9 @@
         </thead>
         <tbody id="corpoTabela">
           <!-- Linhas de carregamento (aparecem enquanto busca os dados) -->
-          <tr class="linha-carregando"><td colspan="10"><div class="animacao-carregamento"></div></td></tr>
-          <tr class="linha-carregando"><td colspan="10"><div class="animacao-carregamento"></div></td></tr>
-          <tr class="linha-carregando"><td colspan="10"><div class="animacao-carregamento"></div></td></tr>
+          <tr class="linha-carregando"><td colspan="9"><div class="animacao-carregamento"></div></td></tr>
+          <tr class="linha-carregando"><td colspan="9"><div class="animacao-carregamento"></div></td></tr>
+          <tr class="linha-carregando"><td colspan="9"><div class="animacao-carregamento"></div></td></tr>
         </tbody>
       </table>
     </div>
@@ -243,7 +249,7 @@
 </main>
 
 
-<!--JANELA FLUTUANTE: NOVO / EDITAR CONTRATO -->
+<!-- JANELA FLUTUANTE: NOVO / EDITAR CONTRATO -->
 <div class="fundo-janela" id="fundoJanela">
   <div class="janela" id="janela">
 
@@ -276,15 +282,6 @@
         <div class="grupo-campo">
           <label class="rotulo-campo">Responsável <span class="obrigatorio">*</span></label>
           <input type="text" id="campoResponsavel" class="campo-input" placeholder="Nome do responsável" required />
-        </div>
-
-      <div class="linha-formulario">
-         <div class="grupo-campo">
-          <label class="rotulo-campo">Tipo financeiro <span class="obrigatorio">*</span></label>
-          <select id="campoTipoFinanceiro" class="campo-input" required>
-            <option value="Entrada">Entrada</option>
-            <option value="Saida">Saída</option>
-          </select>
         </div>
       </div>
 
@@ -342,6 +339,32 @@
 <!-- Área onde as mensagens de confirmação aparecem (canto inferior direito) -->
 <div class="area-mensagens" id="areaMensagens"></div>
 
+
+<!-- Painel informativo de funcionalidade futura -->
+<div class="fundo-painel-info" id="fundoPainelInfo">
+  <div class="painel-info" id="painelInfo">
+    <div class="painel-info-cabecalho">
+      <div class="painel-info-icone" id="painelInfoIcone">
+        <i class="fa-solid fa-rocket"></i>
+      </div>
+      <button class="botao-fechar-janela" id="btnFecharPainelInfo">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <h3 class="painel-info-titulo" id="painelInfoTitulo">Funcionalidade em desenvolvimento</h3>
+    <p class="painel-info-descricao" id="painelInfoDescricao"></p>
+    <ul class="painel-info-lista" id="painelInfoLista"></ul>
+    <div class="painel-info-badge">
+      <i class="fa-solid fa-clock"></i>
+      Disponivel em breve
+    </div>
+    <button class="botao-primario painel-info-botao" id="btnFecharPainelInfoOk">
+      Entendido!
+    </button>
+  </div>
+</div>
+
 <script src="script.js"></script>
 </body>
 </html>
+<!-- SERÁ ADICIONADO VIA PATCH -->
