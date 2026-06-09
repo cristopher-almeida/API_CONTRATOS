@@ -62,7 +62,7 @@ app.MapGet("/api/contratos/saidas", () =>
     return Results.Ok(saidas);
 });
 
-app.MapGet("/api/contratos/resumo-finaceiro", () =>
+app.MapGet("/api/contratos/resumo-financeiro", () =>
 {
     decimal totalEntradas = ContratoRepositorio.contratos
         .Where(c => c.TipoFinanceiro == TipoFinanceiro.Entrada)

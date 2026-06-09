@@ -140,8 +140,9 @@ function aplicarFiltros() {
     // Verifica se a validade está dentro do período escolhido
     let passouPeriodo = true;
     if (periodoEscolhido) {
-      const dias = parseInt(periodoEscolhido);
-      passouPeriodo = contrato.diasparavencer >= 0 && contrato.diasparavencer <= dias;
+      const limiteDias = parseInt(periodoEscolhido);
+      const diasParaVencer = contrato.diasParaVencer
+       passouPeriodo = diasParaVencer >= 0 && diasParaVencer <= limiteDias;
     }
 
     return passouBusca && passouStatus && passouPeriodo;
@@ -190,18 +191,27 @@ function montarTabela() {
 
 // Monta o HTML de uma linha da tabela
 function montarLinha(contrato) {
-  // Define a cor dos dias para vencer
-  const classeDias = contrato.diasparavencer < 0 ? 'dias-vencido' :
-                     contrato.diasparavencer <= 3 ? 'dias-critico' :
-                     contrato.diasparavencer <= 7 ? 'dias-atencao' : 'dias-normal';
+  const dias = contrato.diasParaVencer
 
-  const textoDias = contrato.diasparavencer <= 0 ? '0 dias' : `${contrato.diasparavencer} dias`;
+  const classeDias = dias < 0 ? 'dias-vencido' :
+                     dias <= 3 ? 'dias-critico' :
+                     dias <= 7 ? 'dias-atencao' : 'dias-normal';
 
-  // Define a etiqueta de status
+  const textoDias = dias < 0 ? `${Math.abs(dias)} dias vencido` :
+                    dias === 0 ? 'Vence hoje' :
+                    `${dias} dias`;
+
   const classeStatus = contrato.status === 'Ativo' ? 'status-ativo' :
                        contrato.status === 'PertoDeVencer' ? 'status-perto' : 'status-vencido';
-  const textoStatus  = contrato.status === 'Ativo' ? 'Ativo' :
-                       contrato.status === 'PertoDeVencer' ? 'Perto de vencer' : 'Vencido';
+
+  const textoStatus = contrato.status === 'Ativo' ? 'Ativo' :
+                      contrato.status === 'PertoDeVencer' ? 'Perto de vencer' : 'Vencido';
+
+  const textoTipoFinanceiro = contrato.tipoFinanceiro === 'Saida' ? 'Saída' : 'Entrada';
+
+  const classeTipoFinanceiro = contrato.tipoFinanceiro === 'Saida'
+    ? 'tipo-saida'
+    : 'tipo-entrada';
 
   return `
     <tr>
@@ -209,6 +219,11 @@ function montarLinha(contrato) {
       <td class="coluna-contrato">${escapar(contrato.nome)}</td>
       <td>${escapar(contrato.responsavel)}</td>
       <td class="coluna-valor">${formatarDinheiro(contrato.valor)}</td>
+      <td>
+        <span class="badge-tipo-financeiro ${classeTipoFinanceiro}">
+          ${textoTipoFinanceiro}
+        </span>
+      </td>
       <td>${formatarData(contrato.dataInicio)}</td>
       <td>${formatarData(contrato.validade)}</td>
       <td class="coluna-dias ${classeDias}">${textoDias}</td>
@@ -290,6 +305,7 @@ function abrirEdicao(id) {
   pegar('campoEmpresa').value     = contrato.empresa?.trim() || '';
   pegar('campoNome').value        = contrato.nome?.trim() || '';
   pegar('campoValor').value       = contrato.valor;
+  pegar('campoTipoFinanceiro').value = contrato.tipoFinanceiro || 'Entrada';
   pegar('campoResponsavel').value = contrato.responsavel?.trim() || '';
   pegar('campoInicio').value      = paraFormatoData(contrato.dataInicio);
   pegar('campoValidade').value    = paraFormatoData(contrato.validade);
@@ -306,16 +322,17 @@ function fecharJanela() {
 
 // Abre a janela de visualização dos detalhes
 function abrirVisualizacao(id) {
-  const contrato = todosOsContratos.find(c => c.id === id);
-  if (!contrato) return;
-  contratoVisualizando = contrato;
+  const dias = contrato.diasParaVencer ?? contrato.diasparavencer;
 
-  pegar('tituloVisualizacao').textContent = contrato.nome?.trim() || 'Detalhes';
+const textoDias = dias < 0 ? `${Math.abs(dias)} dias vencido` :
+                  dias === 0 ? 'Vence hoje' :
+                  `${dias} dias`;
 
-  const classeStatus = contrato.status === 'Ativo' ? 'status-ativo' :
-                       contrato.status === 'PertoDeVencer' ? 'status-perto' : 'status-vencido';
-  const textoStatus  = contrato.status === 'Ativo' ? 'Ativo' :
-                       contrato.status === 'PertoDeVencer' ? 'Perto de vencer' : 'Vencido';
+const textoTipoFinanceiro = contrato.tipoFinanceiro === 'Saida' ? 'Saída' : 'Entrada';
+
+const classeTipoFinanceiro = contrato.tipoFinanceiro === 'Saida'
+  ? 'tipo-saida'
+  : 'tipo-entrada';
 
   pegar('gradeDetalhes').innerHTML = `
     <div class="campo-detalhe largura-total">
@@ -335,6 +352,12 @@ function abrirVisualizacao(id) {
       <span class="valor-detalhe">${formatarDinheiro(contrato.valor)}</span>
     </div>
     <div class="campo-detalhe">
+  <span class="rotulo-detalhe">Tipo financeiro</span>
+  <span class="badge-tipo-financeiro ${classeTipoFinanceiro}" style="margin-top:4px">
+    ${textoTipoFinanceiro}
+  </span>
+</div>
+    <div class="campo-detalhe">
       <span class="rotulo-detalhe">Data de início</span>
       <span class="valor-detalhe">${formatarData(contrato.dataInicio)}</span>
     </div>
@@ -344,7 +367,7 @@ function abrirVisualizacao(id) {
     </div>
     <div class="campo-detalhe">
       <span class="rotulo-detalhe">Dias para vencer</span>
-      <span class="valor-detalhe">${contrato.diasparavencer < 0 ? 'Vencido' : contrato.diasparavencer + ' dias'}</span>
+      <span class="valor-detalhe">${textoDias}</span>
     </div>
     <div class="campo-detalhe">
       <span class="rotulo-detalhe">Status</span>
@@ -370,12 +393,13 @@ async function enviarFormulario(evento) {
 
   // Monta o objeto com os dados do formulário
   const dados = {
-    empresa:    pegar('campoEmpresa').value.trim(),
-    nome:       pegar('campoNome').value.trim(),
-    valor:      parseFloat(pegar('campoValor').value),
-    responsavel: pegar('campoResponsavel').value.trim(),
-    dataInicio: pegar('campoInicio').value,
-    validade:   pegar('campoValidade').value
+  empresa: pegar('campoEmpresa').value.trim(),
+  nome: pegar('campoNome').value.trim(),
+  valor: parseFloat(pegar('campoValor').value),
+  responsavel: pegar('campoResponsavel').value.trim(),
+  tipoFinanceiro: pegar('campoTipoFinanceiro').value,
+  dataInicio: pegar('campoInicio').value,
+  validade: pegar('campoValidade').value
   };
 
   const botao = pegar('btnSalvar');
@@ -411,7 +435,7 @@ async function enviarFormulario(evento) {
 // Verifica se todos os campos obrigatórios foram preenchidos
 function validarFormulario() {
   let valido = true;
-  const campos = ['campoEmpresa','campoNome','campoValor','campoResponsavel','campoInicio','campoValidade'];
+  const campos = ['campoEmpresa','campoNome','campoValor','campoTipoFinanceiro','campoResponsavel','campoInicio','campoValidade'];
 
   campos.forEach(id => {
     const campo = pegar(id);
@@ -470,7 +494,7 @@ function exportarCSV() {
     c.valor,
     formatarData(c.dataInicio),
     formatarData(c.validade),
-    c.diasparavencer,
+    c.diasParaVencer,
     c.status === 'PertoDeVencer' ? 'Perto de vencer' : c.status
   ]);
 
