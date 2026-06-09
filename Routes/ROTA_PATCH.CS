@@ -1,5 +1,5 @@
-using ApiContratos.Repositorio;
 using ApiContratos.models;
+using ApiContratos.Repositorio;
 
 namespace ApiContratos.Routes;
 
@@ -7,7 +7,7 @@ public static class ROTA_PATCH
 {
     public static void MapPatchRoutes(this WebApplication app)
     {
-        app.MapMethods("/api/contratos/{id:int}", new[] { "PATCH" }, (int id, Contrato parcial) =>
+        app.MapPatch("/api/contratos/{id:int}", (int id, ContratoPatchDTO parcial) =>
         {
             var contrato = ContratoRepositorio.contratos
                 .FirstOrDefault(c => c.Id == id);
@@ -17,16 +17,52 @@ public static class ROTA_PATCH
                 return Results.NotFound("Contrato não encontrado.");
             }
 
-            // Atualiza só os campos que vieram preenchidos
-            if (!string.IsNullOrEmpty(parcial.Empresa))    contrato.Empresa    = parcial.Empresa;
-            if (!string.IsNullOrEmpty(parcial.Nome))       contrato.Nome       = parcial.Nome;
-            if (!string.IsNullOrEmpty(parcial.Responsavel)) contrato.Responsavel = parcial.Responsavel;
-            if (parcial.Valor > 0)                         contrato.Valor      = parcial.Valor;
-            if (parcial.DataInicio != default)             contrato.DataInicio = parcial.DataInicio;
-            if (parcial.Validade   != default)             contrato.Validade   = parcial.Validade;
-            if (Enum.IsDefined(typeof(TipoFinanceiro), parcial.TipoFinanceiro))
+            DateOnly novaDataInicio = parcial.DataInicio ?? contrato.DataInicio;
+            DateOnly novaValidade = parcial.Validade ?? contrato.Validade;
+
+            if (novaValidade < novaDataInicio)
             {
-                contrato.TipoFinanceiro = parcial.TipoFinanceiro;
+                return Results.BadRequest("A validade não pode ser menor que a data de início.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(parcial.Empresa))
+            {
+                contrato.Empresa = parcial.Empresa.Trim();
+            }
+
+            if (!string.IsNullOrWhiteSpace(parcial.Nome))
+            {
+                contrato.Nome = parcial.Nome.Trim();
+            }
+
+            if (parcial.Valor.HasValue)
+            {
+                if (parcial.Valor.Value <= 0)
+                {
+                    return Results.BadRequest("O valor do contrato deve ser maior que zero.");
+                }
+
+                contrato.Valor = parcial.Valor.Value;
+            }
+
+            if (!string.IsNullOrWhiteSpace(parcial.Responsavel))
+            {
+                contrato.Responsavel = parcial.Responsavel.Trim();
+            }
+
+            if (parcial.DataInicio.HasValue)
+            {
+                contrato.DataInicio = parcial.DataInicio.Value;
+            }
+
+            if (parcial.Validade.HasValue)
+            {
+                contrato.Validade = parcial.Validade.Value;
+            }
+
+            if (parcial.TipoFinanceiro.HasValue)
+            {
+                contrato.TipoFinanceiro = parcial.TipoFinanceiro.Value;
             }
 
             return Results.Ok(contrato);

@@ -173,7 +173,7 @@ function montarTabela() {
   // Nenhum resultado encontrado
   if (contratosDaPagina.length === 0) {
     corpoTabela.innerHTML = `
-      <tr><td colspan="9">
+      <tr><td colspan="10">
         <div class="estado-vazio">
           <i class="fa-solid fa-file-circle-exclamation"></i>
           <h3>Nenhum contrato encontrado</h3>
@@ -322,53 +322,72 @@ function fecharJanela() {
 
 // Abre a janela de visualização dos detalhes
 function abrirVisualizacao(id) {
-  const dias = contrato.diasParaVencer ?? contrato.diasparavencer;
+  
+function abrirVisualizacao(id) {
+  const contrato = todosOsContratos.find(c => c.id === id);
+  if (!contrato) return;
 
-const textoDias = dias < 0 ? `${Math.abs(dias)} dias vencido` :
-                  dias === 0 ? 'Vence hoje' :
-                  `${dias} dias`;
+  const dias = contrato.diasParaVencer
 
-const textoTipoFinanceiro = contrato.tipoFinanceiro === 'Saida' ? 'Saída' : 'Entrada';
+  const textoDias = dias < 0 ? `${Math.abs(dias)} dias vencido` :
+                    dias === 0 ? 'Vence hoje' :
+                    `${dias} dias`;
 
-const classeTipoFinanceiro = contrato.tipoFinanceiro === 'Saida'
-  ? 'tipo-saida'
-  : 'tipo-entrada';
+  const classeStatus = contrato.status === 'Ativo' ? 'status-ativo' :
+                       contrato.status === 'PertoDeVencer' ? 'status-perto' : 'status-vencido';
+
+  const textoStatus = contrato.status === 'Ativo' ? 'Ativo' :
+                      contrato.status === 'PertoDeVencer' ? 'Perto de vencer' : 'Vencido';
+
+  const textoTipoFinanceiro = contrato.tipoFinanceiro === 'Saida' ? 'Saída' : 'Entrada';
+
+  const classeTipoFinanceiro = contrato.tipoFinanceiro === 'Saida'
+    ? 'tipo-saida'
+    : 'tipo-entrada';
 
   pegar('gradeDetalhes').innerHTML = `
     <div class="campo-detalhe largura-total">
       <span class="rotulo-detalhe">Empresa</span>
       <span class="valor-detalhe">${escapar(contrato.empresa)}</span>
     </div>
+
     <div class="campo-detalhe largura-total">
       <span class="rotulo-detalhe">Contrato</span>
       <span class="valor-detalhe">${escapar(contrato.nome)}</span>
     </div>
+
     <div class="campo-detalhe">
       <span class="rotulo-detalhe">Responsável</span>
       <span class="valor-detalhe">${escapar(contrato.responsavel)}</span>
     </div>
+
     <div class="campo-detalhe">
       <span class="rotulo-detalhe">Valor</span>
       <span class="valor-detalhe">${formatarDinheiro(contrato.valor)}</span>
     </div>
+
     <div class="campo-detalhe">
-  <span class="rotulo-detalhe">Tipo financeiro</span>
-  <span class="badge-tipo-financeiro ${classeTipoFinanceiro}" style="margin-top:4px">
-    ${textoTipoFinanceiro}
-  </span>
-</div>
+      <span class="rotulo-detalhe">Tipo financeiro</span>
+      <span class="badge-tipo-financeiro ${classeTipoFinanceiro}" style="margin-top:4px">
+        ${textoTipoFinanceiro}
+      </span>
+    </div>
+
     <div class="campo-detalhe">
       <span class="rotulo-detalhe">Data de início</span>
       <span class="valor-detalhe">${formatarData(contrato.dataInicio)}</span>
     </div>
+
     <div class="campo-detalhe">
       <span class="rotulo-detalhe">Validade</span>
       <span class="valor-detalhe">${formatarData(contrato.validade)}</span>
     </div>
+
     <div class="campo-detalhe">
       <span class="rotulo-detalhe">Dias para vencer</span>
       <span class="valor-detalhe">${textoDias}</span>
     </div>
+
     <div class="campo-detalhe">
       <span class="rotulo-detalhe">Status</span>
       <span class="etiqueta-status ${classeStatus}" style="margin-top:4px">${textoStatus}</span>
@@ -376,6 +395,8 @@ const classeTipoFinanceiro = contrato.tipoFinanceiro === 'Saida'
   `;
 
   pegar('fundoVisualizacao').classList.add('aberto');
+}
+  
 }
 
 // Fecha a janela de visualização
@@ -485,13 +506,14 @@ function exportarCSV() {
   const dados = contratosFiltrados.length ? contratosFiltrados : todosOsContratos;
   if (!dados.length) { mostrarMensagem('Sem dados para exportar.', 'aviso'); return; }
 
-  const cabecalho = ['ID','Empresa','Contrato','Responsável','Valor (R$)','Data Início','Validade','Dias p/ Vencer','Status'];
+  const cabecalho = ['ID','Empresa','Contrato','Responsável','Valor (R$)','Tipo Financeiro','Data Início','Validade','Dias p/ Vencer','Status'];
   const linhas = dados.map(c => [
     c.id,
     `"${(c.empresa||'').trim()}"`,
     `"${(c.nome||'').trim()}"`,
     `"${(c.responsavel||'').trim()}"`,
     c.valor,
+    c.tipoFinanceiro === 'Saida' ? 'Saída' : 'Entrada',
     formatarData(c.dataInicio),
     formatarData(c.validade),
     c.diasParaVencer,
@@ -577,14 +599,14 @@ function escapar(texto) {
 // Mostra as linhas de carregamento na tabela
 function mostrarCarregamento() {
   pegar('corpoTabela').innerHTML = Array(5).fill(`
-    <tr class="linha-carregando"><td colspan="9"><div class="animacao-carregamento"></div></td></tr>
+    <tr class="linha-carregando"><td colspan="10"><div class="animacao-carregamento"></div></td></tr>
   `).join('');
 }
 
 // Mostra uma mensagem de erro na tabela
 function mostrarErroNaTabela(texto) {
   pegar('corpoTabela').innerHTML = `
-    <tr><td colspan="9">
+    <tr><td colspan="10">
       <div class="estado-vazio">
         <i class="fa-solid fa-circle-exclamation"></i>
         <h3>Erro de conexão</h3>

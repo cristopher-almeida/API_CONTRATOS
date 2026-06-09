@@ -58,7 +58,7 @@ API_CONTRATOS/
 
 ### Requisitos
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [.NET 9.0 SDK](https://dotnet.microsoft.com/download)
 - Navegador moderno (Chrome, Firefox, Edge)
 
 ### Passo a passo
@@ -106,6 +106,7 @@ Base URL: `http://localhost:5043`
   "nome": "Contrato de suporte técnico",
   "valor": 2500.00,
   "responsavel": "Carlos Mendes",
+  "tipoFinanceiro": "Entrada",
   "dataInicio": "2026-01-10",
   "validade": "2026-05-20"
 }
@@ -122,7 +123,7 @@ Base URL: `http://localhost:5043`
   "responsavel": "Carlos Mendes",
   "dataInicio": "2026-01-10",
   "validade": "2026-05-20",
-  "diasparavencer": 5,
+  "diasParaVencer": 5,
   "status": "PertoDeVencer"
 }
 ```
